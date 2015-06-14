@@ -1,0 +1,10 @@
+# Lint.computer
+
+This is a work in progress.
+
+
+```python
+
+venv .
+source bin/activate
+pip install -r requirements-dev.txt
