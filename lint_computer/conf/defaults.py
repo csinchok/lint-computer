@@ -30,7 +30,7 @@ CACHES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'betty.db',
+        'NAME': 'lint.db',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -96,7 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
 
-    'lint_commputer.core'
+    'lint_computer.core'
 )
 
 LOGIN_URL = "/login/"
@@ -109,3 +109,5 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
+
+CLONE_DIRECTORY = os.path.join(PROJECT_ROOT, 'clones')

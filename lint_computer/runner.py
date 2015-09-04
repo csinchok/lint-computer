@@ -13,7 +13,7 @@ def generate_settings():
 def main():
     run_app(
         project='lint-computer',
-        default_config_path='./',
+        default_config_path='./lint-computer.conf.py',
         default_settings='lint_computer.conf.defaults',
         settings_initializer='lint_computer.runner.generate_settings',
         settings_envvar='LINTCOMPUTER_CONF',
