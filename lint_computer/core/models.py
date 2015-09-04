@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 
 from git import Repo
+from git.exc import NoSuchPathError
 
 
 class GithubOrganization(models.Model):
@@ -23,15 +24,28 @@ class Repository(models.Model):
     name = models.CharField(max_length=255)
     url = models.URLField(unique=True)
     owner = models.ForeignKey(User, null=True, blank=True)
-    organization = models.ForeignKey(GithubOrganization)
+    organization = models.ForeignKey(GithubOrganization, null=True, blank=True)
+
+    @property
+    def local_path(self):
+        return os.path.join(settings.CLONE_DIRECTORY, str(self.pk))
 
     def generate_report(self):
         pass
 
-    def checkout(self, commit=None):
+    def checkout(self, commit='master'):
         # If commit is none, we'll get the latest
-        local_path = os.path.join(settings.CLONE_DIRECTORY, self.pk)
-        repo = Repo(local_path)
+        try:
+            repo = Repo(self.local_path)
+        except NoSuchPathError:
+            # I guess it was never cloned...
+            repo = Repo.init(self.local_path)
+            repo.create_remote('origin', url=self.url)
+
+        repo.remotes.origin.fetch()
+        bare_master = repo.create_head('master', repo.remotes.origin.refs.master)
+        repo.head.set_reference(bare_master)
+        repo.head.reset(index=True, working_tree=True)
 
 
 class Report(models.Model):

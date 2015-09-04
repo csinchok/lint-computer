@@ -110,4 +110,4 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
-CLONE_DIRECTORY = os.path.join(PROJECT_ROOT, 'clones')
+CLONE_DIRECTORY = os.path.join(PROJECT_ROOT, '..', 'clones')

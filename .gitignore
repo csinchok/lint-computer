@@ -8,3 +8,6 @@ lib
 pip-selfcheck.json
 pyvenv.cfg
 *.sublime-workspace
+
+*.db
+lint-computer.conf.py
