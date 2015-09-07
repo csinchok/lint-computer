@@ -1,7 +1,10 @@
 language: python
 python:
   - "3.4"
+install:
 # command to install dependencies
-install: "pip install -e ."
+  - "pip install -e ."
+# create the config
+  - "echo DEBUG=True > lint-computer.conf.py"
 # command to run tests
 script: "lint-computer test"
