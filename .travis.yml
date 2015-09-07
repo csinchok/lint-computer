@@ -8,3 +8,5 @@ install:
   - "echo DEBUG=True > lint-computer.conf.py"
 # command to run tests
 script: "lint-computer test"
+addons:
+  ssh_known_hosts: github.com
