@@ -13,7 +13,7 @@ class RepoTest(TestCase):
     def test_create(self):
         repo = Repository.objects.create(
             name='lint-computer',
-            url='git@github.com:csinchok/lint-computer.git'
+            url='https://github.com/csinchok/lint-computer'
         )
         assert not os.path.exists(repo.local_path)
 
@@ -31,7 +31,7 @@ class ReportTests(TestCase):
     def setUp(self):
         self.repo = Repository.objects.create(
             name='lint-computer',
-            url='git@github.com:csinchok/lint-computer.git'
+            url='https://github.com/csinchok/lint-computer'
         )
 
     def tearDown(self):
