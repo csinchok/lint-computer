@@ -8,6 +8,8 @@ from django.contrib.auth.models import AbstractBaseUser
 from git import Repo
 from git.exc import NoSuchPathError
 
+from lint_computer.core import reporters
+
 
 class GithubOrganization(models.Model):
     name = models.CharField(max_length=100)
@@ -30,8 +32,27 @@ class Repository(models.Model):
     def local_path(self):
         return os.path.join(settings.CLONE_DIRECTORY, str(self.pk))
 
-    def generate_report(self):
-        pass
+    def generate_report(self, commit):
+        try:
+            report = Report.objects.get(commit=commit)
+        except Report.DoesNotExist:
+            pass
+        else:
+            return report
+
+        self.checkout(commit=commit)
+        errors = reporters.run(self.local_path)
+        report = Report.objects.create(
+            repository=self,
+            commit=commit
+        )
+        for error_data in errors:
+            Error.objects.create(
+                report=report,
+                **error_data
+            )
+
+        return report
 
     def checkout(self, commit='master'):
         # If commit is none, we'll get the latest
@@ -52,6 +73,14 @@ class Report(models.Model):
     repository = models.ForeignKey(Repository)
     commit = models.CharField(max_length=45)
 
+    @property
+    def errors(self):
+        return self.error_set.filter(severity=Error.ERROR)
+
+    @property
+    def warnings(self):
+        return self.error_set.filter(severity=Error.WARNING)
+
 
 class Error(models.Model):
 
@@ -67,6 +96,15 @@ class Error(models.Model):
     path = models.CharField(max_length=1000)
     line = models.IntegerField()
     column = models.IntegerField()
-    severity = models.IntegerField(choices=SEVERITY_CHOICES)
+    severity = models.IntegerField(choices=SEVERITY_CHOICES, default=ERROR)
     message = models.CharField(max_length=1000)
+    code = models.CharField(max_length=20, null=True, blank=True)
     reporter = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return '[{}] {} @ {}/{}'.format(
+            self.get_severity_display(),
+            self.message,
+            self.line,
+            self.column
+        )
