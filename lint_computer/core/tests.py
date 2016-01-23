@@ -38,15 +38,15 @@ class ReportTests(TestCase):
         shutil.rmtree(self.repo.local_path)
 
     def test_report(self):
-        report = self.repo.generate_report('57b5c8ccd6974f00906213c730b470564b9b2a1c')
-        self.assertEqual(len(report.errors), 20)
-        self.assertEqual(len(report.warnings), 1)
+        report = self.repo.generate_report('bfd1005596738cafe4b2766945e2c5b2e1d94e7a')
+        self.assertEqual(len(report.errors), 23)
+        self.assertEqual(len(report.warnings), 3)
 
     def test_pep8(self):
-        self.repo.checkout('57b5c8ccd6974f00906213c730b470564b9b2a1c')
+        self.repo.checkout('bfd1005596738cafe4b2766945e2c5b2e1d94e7a')
 
         errors = run_pep8(self.repo.local_path)
-        self.assertEqual(len(errors), 21)
+        self.assertEqual(len(errors), 26)
 
         for error in errors:
             print(error)
