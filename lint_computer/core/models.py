@@ -1,5 +1,4 @@
 import os.path
-import sys
 
 from django.db import models
 from django.conf import settings
@@ -47,7 +46,7 @@ class Repository(models.Model):
             commit=commit
         )
         for error_data in errors:
-            Error.objects.create(
+            Issue.objects.create(
                 report=report,
                 **error_data
             )
@@ -68,21 +67,29 @@ class Repository(models.Model):
         repo.head.set_reference(bare_master)
         repo.head.reset(index=True, working_tree=True)
 
+    @property
+    def latest_report(self):
+        return self.reports.all()[0]
+
 
 class Report(models.Model):
-    repository = models.ForeignKey(Repository)
+    repository = models.ForeignKey(Repository, related_name='reports')
     commit = models.CharField(max_length=45)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-timestamp',)
 
     @property
     def errors(self):
-        return self.error_set.filter(severity=Error.ERROR)
+        return self.issues.filter(severity=Issue.ERROR)
 
     @property
     def warnings(self):
-        return self.error_set.filter(severity=Error.WARNING)
+        return self.issues.filter(severity=Issue.WARNING)
 
 
-class Error(models.Model):
+class Issue(models.Model):
 
     ERROR = 0
     WARNING = 1
@@ -92,7 +99,7 @@ class Error(models.Model):
         (WARNING, 'Warning')
     )
 
-    report = models.ForeignKey(Report)
+    report = models.ForeignKey(Report, related_name='issues')
     path = models.CharField(max_length=1000)
     line = models.IntegerField()
     column = models.IntegerField()

@@ -47,3 +47,6 @@ class ReportTests(TestCase):
 
         errors = run_pep8(self.repo.local_path)
         self.assertEqual(len(errors), 21)
+
+        for error in errors:
+            print(error)
