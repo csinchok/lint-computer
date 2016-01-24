@@ -39,11 +39,13 @@ class Repository(models.Model):
         else:
             return report
 
-        self.checkout(commit=commit)
+        repo = self.checkout(commit=commit)
+
         errors = reporters.run(self.local_path)
         report = Report.objects.create(
             repository=self,
-            commit=commit
+            commit=commit,
+            branch=repo.active_branch.name
         )
         for error_data in errors:
             Issue.objects.create(
@@ -66,6 +68,7 @@ class Repository(models.Model):
         bare_master = repo.create_head('master', repo.remotes.origin.refs.master)
         repo.head.set_reference(bare_master)
         repo.head.reset(index=True, working_tree=True)
+        return repo
 
     @property
     def latest_report(self):
@@ -74,6 +77,7 @@ class Repository(models.Model):
 
 class Report(models.Model):
     repository = models.ForeignKey(Repository, related_name='reports')
+    branch = models.CharField(max_length=255)
     commit = models.CharField(max_length=45)
     timestamp = models.DateTimeField(auto_now_add=True)
 
